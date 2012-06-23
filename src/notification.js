@@ -120,11 +120,17 @@ const NotificationDialog = new Lang.Class({
                                                 text: '' });
         this._descriptionLabel.clutter_text.ellipsize = Pango.EllipsizeMode.NONE;
         this._descriptionLabel.clutter_text.line_wrap = true;
+
+        this._pomodoroNameInput = new St.Entry({ style_class: 'prompt-dialog-pomodoroname',
+                                                text: 'pomodoro name' });
         
         messageBox.add(this._titleLabel,
                             { y_fill:  false,
                               y_align: St.Align.START });
         messageBox.add(this._descriptionLabel,
+                            { y_fill:  true,
+                              y_align: St.Align.START });
+        messageBox.add(this._pomodoroNameInput,
                             { y_fill:  true,
                               y_align: St.Align.START });
         mainLayout.add(messageBox,
@@ -302,6 +308,14 @@ const NotificationDialog = new Lang.Class({
         
         if (this._notification)
             this._notification.update(this._title, this._description);
+    },
+
+    setPomodoroName: function(text){
+        this._pomodoroNameInput.text = text;
+    },
+
+    get pomodoroName() {
+        return this._pomodoroNameInput.text;
     },
 
     setNotificationButtons: function(buttons) {

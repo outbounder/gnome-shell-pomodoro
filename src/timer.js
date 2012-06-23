@@ -97,6 +97,9 @@ const PomodoroTimer = new Lang.Class({
         this._presence = null;
         this._presenceChangeEnabled = false;
         this._screenSaver = null;
+
+        // contains pomodoro name value from last notification dialog
+        this._lastPomodoroName = null;
         
         this._settings = PomodoroUtil.getSettings();
         this._settings.connect('changed', Lang.bind(this, this._onSettingsChanged));
@@ -348,11 +351,11 @@ const PomodoroTimer = new Lang.Class({
                 break;
             
             case State.PAUSE:
-                // Pause is over
-                if (this._elapsed >= this._elapsedLimit) {
+                // Pause is over, wait for user to start a new pomodoro
+                /*if (this._elapsed >= this._elapsedLimit) {
                     this.setState(this._settings.get_boolean('away-from-desk') ? State.POMODORO : State.IDLE);
                     this._notifyPomodoroStart();
-                }
+                }*/
                 this._updateNotification();
                 break;
             
@@ -430,6 +433,10 @@ const PomodoroTimer = new Lang.Class({
         
         this._notificationDialog = new Notification.NotificationDialog();
         this._notificationDialog.setTitle(_("Pomodoro Finished!")); 
+
+        if(this._lastPomodoroName)
+            this._notificationDialog.setPomodoroName(this._lastPomodoroName);
+
         this._notificationDialog.setButtons([
                 { label: _("Hide"),
                   action: Lang.bind(this, function() {
@@ -452,7 +459,10 @@ const PomodoroTimer = new Lang.Class({
                 }
             ]);
         this._notificationDialog.connect('destroy', Lang.bind(this, function() {
+
+                this._lastPomodoroName = this._notificationDialog.pomodoroName;
                 this._notificationDialog = null;
+
             }));
         
         this._updateNotification();
